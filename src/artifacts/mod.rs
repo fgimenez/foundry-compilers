@@ -754,6 +754,7 @@ pub enum EvmVersion {
     Shanghai,
     #[default]
     Cancun,
+    Prague,
 }
 
 impl EvmVersion {
@@ -763,8 +764,10 @@ impl EvmVersion {
         if *version >= BYZANTIUM_SOLC {
             // If the Solc version is the latest, it supports all EVM versions.
             // For all other cases, cap at the at-the-time highest possible fork.
-            let normalized = if *version >= CANCUN_SOLC {
+            let normalized = if *version >= PRAGUE_SOLC {
                 self
+            } else if self >= Self::Cancun && *version >= CANCUN_SOLC {
+                Self::Cancun
             } else if self >= Self::Shanghai && *version >= SHANGHAI_SOLC {
                 Self::Shanghai
             } else if self >= Self::Paris && *version >= PARIS_SOLC {
@@ -805,6 +808,7 @@ impl EvmVersion {
             Self::Paris => "paris",
             Self::Shanghai => "shanghai",
             Self::Cancun => "cancun",
+            Self::Prague => "prague",
         }
     }
 
@@ -873,6 +877,7 @@ impl FromStr for EvmVersion {
             "paris" => Ok(Self::Paris),
             "shanghai" => Ok(Self::Shanghai),
             "cancun" => Ok(Self::Cancun),
+            "prague" => Ok(Self::Prague),
             s => Err(format!("Unknown evm version: {s}")),
         }
     }
@@ -2104,6 +2109,11 @@ mod tests {
             ("0.8.24", EvmVersion::Homestead, Some(EvmVersion::Homestead)),
             ("0.8.24", EvmVersion::Shanghai, Some(EvmVersion::Shanghai)),
             ("0.8.24", EvmVersion::Cancun, Some(EvmVersion::Cancun)),
+            // Prague
+            ("0.8.26", EvmVersion::Homestead, Some(EvmVersion::Homestead)),
+            ("0.8.26", EvmVersion::Shanghai, Some(EvmVersion::Shanghai)),
+            ("0.8.26", EvmVersion::Cancun, Some(EvmVersion::Cancun)),
+            ("0.8.26", EvmVersion::Prague, Some(EvmVersion::Prague)),
         ] {
             let version = Version::from_str(solc_version).unwrap();
             assert_eq!(
