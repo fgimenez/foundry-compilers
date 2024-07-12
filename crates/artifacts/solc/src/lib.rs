@@ -817,11 +817,8 @@ impl EvmVersion {
         if *version >= BYZANTIUM_SOLC {
             // If the Solc version is the latest, it supports all EVM versions.
             // For all other cases, cap at the at-the-time highest possible fork.
-
-            let normalized = if *version >= PRAGUE_SOLC {
+            let normalized = if *version >= CANCUN_SOLC {
                 self
-            } else if self >= Self::Cancun && *version >= CANCUN_SOLC {
-                Self::Cancun
             } else if self >= Self::Shanghai && *version >= SHANGHAI_SOLC {
                 Self::Shanghai
             } else if self >= Self::Paris && *version >= PARIS_SOLC {
